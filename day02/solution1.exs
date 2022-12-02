@@ -1,37 +1,30 @@
 defmodule Functions do
-  def score([opp, me], acc) do
-    opp_atom = String.to_atom(opp)
-    me_atom = String.to_atom(me)
-    score_outcome(opp_atom, me_atom) + score_choice(me_atom) + acc
+  @rock 0
+  # @paper 1   (not used anywhere)
+  @scissors 2
+
+  def decode(value) do
+    value
+    |> String.to_charlist()
+    |> List.first()
   end
 
-  # Opp rock
-  # Rock - Rock
-  def score_outcome(:A, :X), do: 3
-  # Rock - Paper
-  def score_outcome(:A, :Y), do: 6
-  # Rock - Scissors
-  def score_outcome(:A, :Z), do: 0
+  def score([theirs, mine], acc) do
+    d_theirs = decode(theirs) - ?A
+    d_mine = decode(mine) - ?X
+    score_outcome(d_theirs, d_mine) + d_mine + 1 + acc
+  end
 
-  # Opp paper
-  # Paper - Rock
-  def score_outcome(:B, :X), do: 0
-  # Paper - Paper
-  def score_outcome(:B, :Y), do: 3
-  # Paper - Scissors
-  def score_outcome(:B, :Z), do: 6
+  # Draws - when their choice is the same as mine
+  def score_outcome(theirs, theirs), do: 3
 
-  # Opp scissors
-  # Scissors - Rock
-  def score_outcome(:C, :X), do: 6
-  # Scissors - Paper
-  def score_outcome(:C, :Y), do: 0
-  # Scissors - Scissors
-  def score_outcome(:C, :Z), do: 3
+  # Wins
+  # First case captures paper beats rock and scissors beats paper
+  def score_outcome(theirs, mine) when theirs + 1 == mine, do: 6
+  def score_outcome(@scissors, @rock), do: 6
 
-  def score_choice(:X), do: 1
-  def score_choice(:Y), do: 2
-  def score_choice(:Z), do: 3
+  # Rest of cases are losses
+  def score_outcome(_theirs, _mine), do: 0
 end
 
 File.stream!("inputs", [:utf8], :line)

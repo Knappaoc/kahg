@@ -1,40 +1,34 @@
 defmodule Functions do
-  def score([opp, outcome], acc) do
-    opp_atom = String.to_atom(opp)
-    outcome_atom = String.to_atom(outcome)
-    score_outcome(outcome_atom) + score_choice(opp_atom, outcome_atom) + acc
+  @loss 0
+  @draw 1
+  @win 2
+
+  def decode(value) do
+    value
+    |> String.to_charlist()
+    |> List.first()
   end
 
-  # Lose
-  def score_outcome(:X), do: 0
-  # Draw
-  def score_outcome(:Y), do: 3
-  # Win
-  def score_outcome(:Z), do: 6
+  def score([theirs, outcome], acc) do
+    d_theirs = decode(theirs) - ?A
+    d_outcome = decode(outcome) - ?X
+    3 * (d_outcome) + score_choice(d_theirs, d_outcome) + 1 + acc
+  end
 
-  # Opp rock
-  # Rock - Lose - Have to give scissors
-  def score_choice(:A, :X), do: 3
-  # Rock - Draw - Have to give rock
-  def score_choice(:A, :Y), do: 1
-  # Rock - win - Have to give paper
-  def score_choice(:A, :Z), do: 2
-
-  # Opp paper
-  # Paper - Lose - Have to give rock
-  def score_choice(:B, :X), do: 1
-  # Paper - Draw - Have to give paper
-  def score_choice(:B, :Y), do: 2
-  # Paper - Win - Have to give scissors
-  def score_choice(:B, :Z), do: 3
-
-  # Opp scissors
-  # Scissors - Lose - Have to give paper
-  def score_choice(:C, :X), do: 2
-  # Scissors - Draw - Have to give scissors
-  def score_choice(:C, :Y), do: 3
-  # Scissors - Win - Have to give rock
-  def score_choice(:C, :Z), do: 1
+  # This works based on rock < paper < scissors
+  #   rock 0
+  #   paper 1
+  #   scissors 2
+  def score_choice(theirs, outcome)
+  def score_choice(theirs, @draw), do: theirs
+  def score_choice(theirs, @win) do
+    # In this case, the points is the "next one up"
+    rem(theirs + 1, 3)
+  end
+  def score_choice(theirs, @loss) do
+    # The first part is from: theirs - 1 + 3 = theirs + 2
+    rem(theirs + 2, 3)
+  end
 end
 
 File.stream!("inputs", [:utf8], :line)
