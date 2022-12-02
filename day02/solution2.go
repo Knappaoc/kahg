@@ -9,36 +9,11 @@ import (
 )
 
 const (
-	// Choices
-	ROCK     = 0
-	PAPER    = 1
-	SCISSORS = 2
-
 	// Outcomes
 	LOSS = 0
 	DRAW = 1
 	WIN  = 2
 )
-
-// Map from their choice, to the desired outcome and
-// then the required choice to get that desired outcome.
-var theirsToMineRequired = map[byte]map[byte]byte{
-	ROCK: {
-		LOSS: SCISSORS,
-		DRAW: ROCK,
-		WIN:  PAPER,
-	},
-	PAPER: {
-		LOSS: ROCK,
-		DRAW: PAPER,
-		WIN:  SCISSORS,
-	},
-	SCISSORS: {
-		LOSS: PAPER,
-		DRAW: SCISSORS,
-		WIN:  ROCK,
-	},
-}
 
 func check(err error) {
 	if err != nil {
@@ -68,8 +43,19 @@ func main() {
 
 		// Work out my choice from the outcome and the points. +1 since
 		// there is at least one point (for rock)
-		score += uint(theirsToMineRequired[theirChoice][outcome]) + 1
+		switch outcome {
+		case DRAW:
+			score += uint(theirChoice)
+		case WIN:
+			score += (uint(theirChoice) + 1) % 3
+		case LOSS:
+			// The points from this is: theirs - 1 + 3 = theirs + 2
+			score += (uint(theirChoice) + 2) % 3
+		}
+
+		// Score for choices start from 1
+		score += 1
 	}
 
-	fmt.Println("Score: ", score)
+	fmt.Println("Score:", score)
 }

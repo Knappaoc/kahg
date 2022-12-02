@@ -8,19 +8,7 @@ import (
 	"strings"
 )
 
-const (
-	ROCK     = 0
-	PAPER    = 1
-	SCISSORS = 2
-)
-
-// Map from their choice to the choice I need to make
-// to win
-var choiceToWin = map[byte]byte{
-	ROCK:     PAPER,
-	PAPER:    SCISSORS,
-	SCISSORS: ROCK,
-}
+var order = "ABCA"
 
 func check(err error) {
 	if err != nil {
@@ -42,23 +30,27 @@ func main() {
 		// Since each choice is just one character, we
 		// can just use runes to perform a simple calculation
 		// to convert them to points.
-		theirChoice := tokens[0][0] - 'A'
-		myChoice := tokens[1][0] - 'X'
+		theirChoice := tokens[0][0]
+		myChoice := tokens[1][0] - 'X' + 'A'
 
 		// Add points from selection. +1 since points start
 		// at 1, not 0.
-		score += uint(myChoice) + 1
+		score += uint(myChoice-'A') + 1
 
 		// Add points from result
 		if theirChoice == myChoice {
 			// Draw
 			score += 3
-		} else if choiceToWin[theirChoice] == myChoice {
-			// Win
-			score += 6
+		} else {
+			theirIndex := strings.IndexByte(order, theirChoice)
+			mineIndex := strings.LastIndexByte(order, myChoice)
+			if theirIndex+1 == mineIndex {
+				// This means I've won
+				score += 6
+			}
+			// otherwise, we lose
 		}
-		// No score for loss
 	}
 
-	fmt.Println("Score: ", score)
+	fmt.Println("Score:", score)
 }
