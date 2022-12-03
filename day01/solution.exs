@@ -1,34 +1,19 @@
 defmodule Functions do
-  @doc """
-  Receives each entry and accumulates the total calories for
-  each elf. A nil value represents a new elf is expected.
-  """
-  def calc_cals("", {sum, acc}), do: {nil, add_to(sum, acc)}
+  def chunk_while(item, acc)
+  def chunk_while("", acc), do: {:cont, acc, []}
+  def chunk_while(item, acc), do: {:cont, [String.to_integer(item) | acc]}
 
-  def calc_cals(value, context) when is_binary(value) do
-    value
-    |> String.trim()
-    |> String.to_integer()
-    |> calc_cals(context)
-  end
-
-  def calc_cals(value, {nil, acc}), do: {value, acc}
-  def calc_cals(value, {sum, acc}), do: {value + sum, acc}
-
-  @doc """
-  Adds a new value to the accumulator, as long as it isn't nil.
-  """
-  def add_to(nil, acc), do: acc
-  def add_to(value, acc), do: [value | acc]
+  def chunk_end(acc)
+  def chunk_end([]), do: {:cont, []}
+  def chunk_end(acc), do: {:cont, acc, []}
 end
 
-# Stream each line in the file and collect the total calories.
-{last, acc} = File.stream!("inputs", [:utf8], :line)
+# Stream each line in the file and collect the top 3 total calories.
+{top, _} = File.stream!("inputs", [:utf8], :line)
   |> Stream.map(&String.trim/1)
-  |> Enum.reduce({nil, []}, &Functions.calc_cals/2)
-
-# Interested in, at most, the 3 highest totals.
-{top, _} = Functions.add_to(last, acc)
+  |> Stream.chunk_while([], &Functions.chunk_while/2, &Functions.chunk_end/1)
+  |> Stream.reject(&Enum.empty?/1)
+  |> Stream.map(fn values -> Enum.reduce(values, &(&1 + &2)) end)
   |> Enum.sort(:desc)
   |> Enum.split(3)
 
