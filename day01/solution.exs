@@ -1,5 +1,5 @@
 defmodule Functions do
-  """@doc
+  @doc """
   Receives each entry and accumulates the total calories for
   each elf. A nil value represents a new elf is expected.
   """
@@ -15,7 +15,7 @@ defmodule Functions do
   def calc_cals(value, {nil, acc}), do: {value, acc}
   def calc_cals(value, {sum, acc}), do: {value + sum, acc}
 
-  """@doc
+  @doc """
   Adds a new value to the accumulator, as long as it isn't nil.
   """
   def add_to(nil, acc), do: acc
