@@ -16,6 +16,21 @@ func check(err error) {
 	}
 }
 
+func nextElf(scanner *bufio.Scanner) (bool, uint) {
+	var sum uint = 0
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" {
+			return true, sum
+		} else {
+			value, err := strconv.Atoi(line)
+			check(err)
+			sum += uint(value)
+		}
+	}
+	return false, sum
+}
+
 func main() {
 	file, err := os.Open("inputs")
 	check(err)
@@ -24,35 +39,10 @@ func main() {
 	// Stream the contents and collect the totals
 	scanner := bufio.NewScanner(file)
 
-	// When true, we are in the middle of an elf's entries
-	// as we read each calory. False when we are waiting
-	// for the next elf.
-	grouping := false
-
-	// This value is tracking an individual elf's
-	var calories uint = 0
-
 	// Accumulator for each elf's total calories.
-	acc := make([]uint, 0)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if line == "" {
-			if grouping {
-				grouping = false
-				acc = append(acc, calories)
-				calories = 0
-			}
-		} else {
-			var value int
-			value, err := strconv.Atoi(line)
-			check(err)
-			calories += uint(value)
-			grouping = true
-		}
-	}
+	acc := make([]uint, 4)
 
-	// In case the inputs don't end with an empty line!
-	if grouping {
+	for more, calories := nextElf(scanner); more; more, calories = nextElf(scanner) {
 		acc = append(acc, calories)
 	}
 
