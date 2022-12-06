@@ -90,17 +90,14 @@ func main() {
 	// Parse the instructions
 	for scanner.Scan() {
 		line := scanner.Text()
-		parts := strings.Fields(line)
 
 		var n, src, dest int = 0, 0, 0
-		var err error = nil
 
-		n, err = strconv.Atoi(parts[1])
+		read, err := fmt.Sscanf(line, "move %d from %d to %d", &n, &src, &dest)
 		check(err)
-		src, err = strconv.Atoi(parts[3])
-		check(err)
-		dest, err = strconv.Atoi(parts[5])
-		check(err)
+		if read < 3 {
+			log.Fatalf("Expected 3 items to be parsed, got %d\n", read)
+		}
 
 		crane1.move(n, src-1, dest-1, reverse)
 		crane2.move(n, src-1, dest-1, func(x string) string { return x })
