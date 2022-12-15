@@ -1,5 +1,4 @@
 defmodule Parse do
-
   defmodule Context do
     defstruct text: "", list: [], counts: [0]
   end
@@ -45,9 +44,11 @@ defmodule Parse do
   end
 
   defp get_sublists(list, 0), do: {[], list}
+
   defp get_sublists(list, count) do
-    sublist = Enum.slice(list, 0..count - 1)
-    |> Enum.reverse()
+    sublist =
+      Enum.slice(list, 0..(count - 1))
+      |> Enum.reverse()
 
     listEnd = Enum.slice(list, count, length(list) - 1)
     {sublist, listEnd}
