@@ -38,8 +38,5 @@ defmodule Puzzle do
   # the row.
   defp do_cols_on_row(radius, _center) when radius < 0, do: []
 
-  defp do_cols_on_row(radius, center) do
-    -radius..radius
-    |> Enum.map(fn r -> center + r end)
-  end
+  defp do_cols_on_row(radius, center), do: (center - radius)..(center + radius)
 end
