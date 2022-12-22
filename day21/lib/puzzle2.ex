@@ -78,13 +78,15 @@ defmodule Puzzle2 do
       do: :human
 
   def do_solve(monkeys, %Monkey{piece: {left, op, right}}) do
-    left_v = Map.get(monkeys, left)
-    right_v = Map.get(monkeys, right)
+    left_monkey = Map.get(monkeys, left)
+    right_monkey = Map.get(monkeys, right)
 
-    case {do_solve(monkeys, left_v), do_solve(monkeys, right_v)} do
-      {:human, _v} -> :human
-      {_v, :human} -> :human
-      {value_left, value_right} -> op(value_left, op, value_right)
+    with left_value when left_value != :human <- do_solve(monkeys, left_monkey),
+      right_value when right_value != :human <- do_solve(monkeys, right_monkey)
+    do
+      op(left_value, op, right_value)
+    else
+      _ -> :human
     end
   end
 
