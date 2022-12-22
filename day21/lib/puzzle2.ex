@@ -16,7 +16,7 @@ defmodule Puzzle2 do
     {value, _value_monkey, human} =
       humanise({r_left_value, r_left_monkey}, {r_right_value, r_right_monkey})
 
-    # Step 3 - Solve!
+    # Step 3 - Solve the human side!
     rev_solve(monkeys, human, value)
   end
 
@@ -35,19 +35,17 @@ defmodule Puzzle2 do
   end
 
   def rev_solve(monkeys, %Monkey{piece: {left, op, right}}, target) do
-    # Step 1 - we need to figure out which side we can work on.
-    # Root should have two pieces. Might be easier to do one side at a time.
-    # Assumption is that the root isn't directly on humn.
+    # Step 1 - Try solving both sides and work out which monkey is the "human" and which is solvable.
     left_monkey = Map.get(monkeys, left)
     right_monkey = Map.get(monkeys, right)
 
-    # Step 2 - One side is :human, the other side is the value.
     left_value = do_solve(monkeys, left_monkey)
     right_value = do_solve(monkeys, right_monkey)
 
+    # Step 2 - What is the new target?
     new_target = rev_target(left_value, op, right_value, target)
 
-    # Step 3 - What is the new target?
+    # Step 3 - Recurse to solve the "human" side.
     {_value, _value_monkey, human} =
       humanise({left_value, left_monkey}, {right_value, right_monkey})
 
@@ -66,8 +64,12 @@ defmodule Puzzle2 do
   def non_human_piece(%Monkey{piece: {left, _op, %Monkey{id: "humn"}}}), do: {left, :right}
   def non_human_piece(%Monkey{piece: {%Monkey{id: "humn"}, _op, right}}), do: {right, :left}
 
+  @doc """
+  This is a convenience function to consistently distinguish between a "solved" monkey side and the "human" monkey.
+  The arguments are the two monkeys, given as a tuple {value, monkey} (where value is the solved value or :human if it is a human monkey).
+  Returns a tuple consisting of {solved value, solved monkey, human monkey}.
+  """
   def humanise({left, left_monkey}, {:human, right_monkey}), do: {left, left_monkey, right_monkey}
-
   def humanise({:human, left_monkey}, {right, right_monkey}),
     do: {right, right_monkey, left_monkey}
 
